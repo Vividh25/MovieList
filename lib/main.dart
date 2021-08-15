@@ -1,17 +1,20 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Boxes.dart';
+import 'package:flutter_application_1/list_model.dart';
 import 'movie_form.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-import 'list_model.dart';
+import 'package:path_provider/path_provider.dart' as pathProvider;
 
-var movies;
+// TypeAdapter<dynamic> testAdapter = MovieAdapter() as TypeAdapter;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // var dir = await getApplicationDocumentsDirectory();
-  // Hive.init(dir.path);
-  await Hive.openBox<Movie>('movies');
-
+  await Hive.initFlutter();
+  Hive.registerAdapter(MovieModelAdapter());
+  await Hive.openBox<MovieModel>('movies');
   runApp(MyApp());
 }
 
@@ -45,35 +48,60 @@ class MovieList extends StatefulWidget {
 }
 
 class _MovieListState extends State<MovieList> {
-  bool showForm = false;
-  // bool submitForm = MovieForm().submitForm;
-  // final _movies = <Movie>[];
   @override
   Widget build(BuildContext context) {
-    Hive.box('movies').put(0, Movie("something", "someguy", "someimg"));
-    return Column(
-      children: [
-        FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => MovieForm()));
-          },
-          child: const Icon(Icons.add),
-        ),
-        // debugPrint($MovieForm().movies);
+    return Scaffold(
+      body: ValueListenableBuilder<Box<MovieModel>>(
+        valueListenable: Boxes.getMovies().listenable(),
+        builder: (context, box, _) {
+          final movies = box.values.toList().cast<MovieModel>();
 
-        // ListView.builder(
-        //     padding: const EdgeInsets.all(16.0),
-        //     itemBuilder: (context, i) {
-        //       if (i.isOdd) {
-        //         return const Divider();
-        //       }
-        //       final index = 1 ~/ 2;
-        //       return _buildRow(MovieForm().movies[index]);
-        //     })
-        Text(Hive.box('movies').get(0).movieName)
-      ],
+          return buildContent(movies);
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () => Navigator.push(
+            context, MaterialPageRoute(builder: (context) => MovieForm())),
+      ),
     );
+
+    // return Column(
+    //   children: [
+    //     FloatingActionButton(
+    //       onPressed: () {
+    //         Navigator.push(
+    //             context, MaterialPageRoute(builder: (context) => MovieForm()));
+    //       },
+    //       child: const Icon(Icons.add),
+    //     ),
+    //     // debugPrint($MovieForm().movies);
+
+    //     // ListView.builder(
+    //     //     padding: const EdgeInsets.all(16.0),
+    //     //     itemBuilder: (context, i) {
+    //     //       if (i.isOdd) {
+    //     //         return const Divider();
+    //     //       }
+    //     //       final index = 1 ~/ 2;
+    //     //       return _buildRow(MovieForm().movies[index]);
+    //     //     })
+    //     Text(Hive.box('movies').get(0).movieName)
+    //   ],
+    // );
+  }
+
+  Widget buildContent(List<MovieModel> movies) {
+    if (movies.isEmpty) {
+      return const Center(
+        child: Text(
+          "No movies added",
+          style: TextStyle(fontSize: 24),
+        ),
+      );
+    } else {
+      return Text(movies[0].movieName);
+    }
   }
 }
 

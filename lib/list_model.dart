@@ -1,10 +1,14 @@
-class Movie {
-  String movieName = "";
-  String directorName = "";
-  String imgUrl = "";
-  Movie(String name, String director, String img) {
-    directorName = director;
-    movieName = name;
-    imgUrl = img;
-  }
+import 'package:hive/hive.dart';
+part 'list_model.g.dart';
+
+@HiveType(typeId: 0)
+class MovieModel extends HiveObject {
+  @HiveField(0)
+  late String movieName;
+
+  @HiveField(1)
+  late String directorName;
+
+  @HiveField(2)
+  late String imgUrl;
 }

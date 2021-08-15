@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'list_model.dart';
+import 'package:flutter_application_1/Boxes.dart';
+import 'package:flutter_application_1/list_model.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -10,7 +11,7 @@ void main() async {
 }
 
 class MovieForm extends StatefulWidget {
-  final movies = <Movie>[];
+  // final movies = <Movie>[];
   // bool submitForm = false;
 
   MovieForm({Key? key}) : super(key: key);
@@ -24,26 +25,31 @@ class _MovieFormState extends State<MovieForm> {
   final movieNameController = TextEditingController();
   final directorNameController = TextEditingController();
   final posterController = TextEditingController();
-  final moviesState = <Movie>[];
+  // final List<MovieModel> movies = [];
+  // final moviesState = <Movie>[];
 
   @override
   void dispose() {
+    Hive.close();
     movieNameController.dispose();
     directorNameController.dispose();
     posterController.dispose();
     super.dispose();
   }
 
-  void handleSubmit() {
-    // debugPrint('name: $movieNameController.text');
+  // addItem(MovieModel movie) async {
+  //   var movies = await Hive.openBox<MovieModel>('movies');
+  //   movies.add(movie);
+  //   notifyListners();
+  // }
 
-    Movie newMovie = Movie(movieNameController.text,
-        directorNameController.text, posterController.text);
-    // debugPrint('New movie: $newMovie');
-    // widget.movies.add(newMovie);
-    // print('movie array: $widget.movies[0]');
-    int i = 0;
-    Hive.box('movies').put(i++, newMovie);
+  void handleSubmit() async {
+    final movie = MovieModel()
+      ..movieName = movieNameController.text
+      ..directorName = directorNameController.text
+      ..imgUrl = posterController.text;
+    final box = Boxes.getMovies();
+    box.add(movie);
     Navigator.pop(context);
   }
 
