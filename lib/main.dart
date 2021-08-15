@@ -4,8 +4,8 @@ import 'package:flutter_application_1/list_model.dart';
 import 'movie_form.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
-// TypeAdapter<dynamic> testAdapter = MovieAdapter() as TypeAdapter;
+import 'package:cached_network_image/cached_network_image.dart';
+import 'edit_dialog.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,12 +15,6 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
-// void main() async {
-//   await Hive.initFlutter();
-//   await Hive.openBox<Movie>('movies');
-//   runApp(MyApp());
-// }
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -29,7 +23,6 @@ class MyApp extends StatelessWidget {
       title: appTitle,
       theme: ThemeData(primarySwatch: Colors.indigo),
       home: Scaffold(
-        // backgroundColor: Colors.indigo,
         appBar: AppBar(
           centerTitle: true,
           title: const Text(appTitle,
@@ -66,30 +59,6 @@ class _MovieListState extends State<MovieList> {
             context, MaterialPageRoute(builder: (context) => MovieForm())),
       ),
     );
-
-    // return Column(
-    //   children: [
-    //     FloatingActionButton(
-    //       onPressed: () {
-    //         Navigator.push(
-    //             context, MaterialPageRoute(builder: (context) => MovieForm()));
-    //       },
-    //       child: const Icon(Icons.add),
-    //     ),
-    //     // debugPrint($MovieForm().movies);
-
-    //     // ListView.builder(
-    //     //     padding: const EdgeInsets.all(16.0),
-    //     //     itemBuilder: (context, i) {
-    //     //       if (i.isOdd) {
-    //     //         return const Divider();
-    //     //       }
-    //     //       final index = 1 ~/ 2;
-    //     //       return _buildRow(MovieForm().movies[index]);
-    //     //     })
-    //     Text(Hive.box('movies').get(0).movieName)
-    //   ],
-    // );
   }
 
   Widget buildContent(List<MovieModel> movies) {
@@ -109,12 +78,31 @@ class _MovieListState extends State<MovieList> {
         padding: const EdgeInsets.all(8.0),
         itemCount: movies.length,
         itemBuilder: (context, index) {
-          final movie = movies[index];
+          MovieModel movie = movies[index];
+          String url = movie.imgUrl;
           return Container(
-              color: Colors.amber,
+              padding: const EdgeInsets.only(top: 10),
               child: ListTile(
+                  onTap: () => {displayEditDialog(context, movie)},
                   title: Text(movie.movieName),
-                  leading: Image.network(movie.imgUrl),
+                  leading: CachedNetworkImage(
+                    imageBuilder: (context, imageProvider) => Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              image: imageProvider, fit: BoxFit.contain)),
+                    ),
+                    imageUrl: url,
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => const SizedBox(
+                      height: 80,
+                      width: 80,
+                      child: Icon(Icons.error),
+                    ),
+                  ),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () {
@@ -122,61 +110,8 @@ class _MovieListState extends State<MovieList> {
                     },
                   ),
                   subtitle: Text(movie.directorName)));
-          // return ListTile(
-          //     title: Text(movie.movieName),
-          //     leading: Image.network(movie.imgUrl),
-          //     trailing: IconButton(
-          //       icon: const Icon(Icons.delete),
-          //       onPressed: () {
-          //         deleteMovie(movie);
-          //       },
-          //     ),
-          //     subtitle: Text(movie.directorName));
         },
       );
     }
   }
 }
-
-// class RandomWords extends StatefulWidget {
-//   const RandomWords({Key? key}) : super(key: key);
-
-//   @override
-//   _RandomWordsState createState() => _RandomWordsState();
-// }
-
-// class _RandomWordsState extends State<RandomWords> {
-//   final _suggestions = <WordPair>[];
-//   final _biggerFont = const TextStyle(fontSize: 18.0);
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: const Text('Startup Name Generator')),
-//       body: _buildSuggestions(),
-//     );
-//   }
-
-//   Widget _buildSuggestions() {
-//     return ListView.builder(
-//         padding: const EdgeInsets.all(16.0),
-//         itemBuilder: (context, i) {
-//           if (i.isOdd) {
-//             return const Divider();
-//           }
-//           final index = i ~/ 2;
-//           if (index >= _suggestions.length) {
-//             _suggestions.addAll(generateWordPairs().take(10));
-//           }
-//           return _buildRow(_suggestions[index]);
-//         });
-//   }
-
-//   Widget _buildRow(WordPair pair) {
-//     return ListTile(
-//       title: Text(
-//         pair.asPascalCase,
-//         style: _biggerFont,
-//       ),
-//     );
-//   }
-// }
