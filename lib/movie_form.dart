@@ -30,7 +30,7 @@ class _MovieFormState extends State<MovieForm> {
 
   @override
   void dispose() {
-    Hive.close();
+    // Hive.close();
     movieNameController.dispose();
     directorNameController.dispose();
     posterController.dispose();
@@ -60,6 +60,7 @@ class _MovieFormState extends State<MovieForm> {
             key: _formKey,
             child: Column(
               children: <Widget>[
+                const Padding(padding: EdgeInsets.fromLTRB(3, 3, 3, 3)),
                 TextFormField(
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -67,9 +68,14 @@ class _MovieFormState extends State<MovieForm> {
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(hintText: 'Movie name'),
+                  decoration: const InputDecoration(
+                      // focusedBorder: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.all(8),
+                      border: UnderlineInputBorder(),
+                      hintText: 'Movie name'),
                   controller: movieNameController,
                 ),
+                const Padding(padding: EdgeInsets.fromLTRB(3, 3, 3, 3)),
                 TextFormField(
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -77,7 +83,11 @@ class _MovieFormState extends State<MovieForm> {
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(hintText: 'Director Name'),
+                  decoration: const InputDecoration(
+                      // focusedBorder: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.all(8),
+                      border: UnderlineInputBorder(),
+                      hintText: 'Director Name'),
                   controller: directorNameController,
                 ),
                 TextFormField(
@@ -87,7 +97,11 @@ class _MovieFormState extends State<MovieForm> {
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(hintText: 'Poster'),
+                  decoration: const InputDecoration(
+                      // focusedBorder: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.all(8),
+                      border: UnderlineInputBorder(),
+                      hintText: 'Poster'),
                   controller: posterController,
                 ),
                 Padding(

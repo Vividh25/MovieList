@@ -1,12 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Boxes.dart';
 import 'package:flutter_application_1/list_model.dart';
 import 'movie_form.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart' as pathProvider;
 
 // TypeAdapter<dynamic> testAdapter = MovieAdapter() as TypeAdapter;
 
@@ -27,12 +24,16 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    const appTitle = 'Movie list';
+    const appTitle = 'Cinephile';
     return MaterialApp(
       title: appTitle,
+      theme: ThemeData(primarySwatch: Colors.indigo),
       home: Scaffold(
+        // backgroundColor: Colors.indigo,
         appBar: AppBar(
-          title: const Text(appTitle),
+          centerTitle: true,
+          title: const Text(appTitle,
+              style: TextStyle(fontWeight: FontWeight.w100)),
         ),
         body: const MovieList(),
       ),
@@ -92,6 +93,10 @@ class _MovieListState extends State<MovieList> {
   }
 
   Widget buildContent(List<MovieModel> movies) {
+    deleteMovie(MovieModel movie) {
+      movie.delete();
+    }
+
     if (movies.isEmpty) {
       return const Center(
         child: Text(
@@ -100,7 +105,35 @@ class _MovieListState extends State<MovieList> {
         ),
       );
     } else {
-      return Text(movies[0].movieName);
+      return ListView.builder(
+        padding: const EdgeInsets.all(8.0),
+        itemCount: movies.length,
+        itemBuilder: (context, index) {
+          final movie = movies[index];
+          return Container(
+              color: Colors.amber,
+              child: ListTile(
+                  title: Text(movie.movieName),
+                  leading: Image.network(movie.imgUrl),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      deleteMovie(movie);
+                    },
+                  ),
+                  subtitle: Text(movie.directorName)));
+          // return ListTile(
+          //     title: Text(movie.movieName),
+          //     leading: Image.network(movie.imgUrl),
+          //     trailing: IconButton(
+          //       icon: const Icon(Icons.delete),
+          //       onPressed: () {
+          //         deleteMovie(movie);
+          //       },
+          //     ),
+          //     subtitle: Text(movie.directorName));
+        },
+      );
     }
   }
 }
